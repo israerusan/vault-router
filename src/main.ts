@@ -241,12 +241,22 @@ export default class VaultRouterPlugin extends Plugin {
     let summary = `${PRODUCT_NAME}: moved ${moved}, skipped ${skipped}`;
     summary += failed ? `, failed ${failed}.` : ".";
     if (hitCap) {
-      summary += ` Free is capped at ${FREE_BULK_LIMIT} moves per sweep — run it again or upgrade to Pro for unlimited.`;
+      summary += ` Free stopped after ${FREE_BULK_LIMIT} moves this run — run it again to file any remaining matches, or upgrade to Pro for unlimited.`;
     }
     new Notice(summary, 7000);
   }
 
   private describeRoute(file: TFile): string {
+    // Preview must respect the same inbox gate doRouteFile enforces, or it would
+    // promise a move that "Route current note" then refuses for a note outside
+    // the Inbox (autoRouteOnlyInbox defaults on).
+    if (this.settings.autoRouteOnlyInbox) {
+      const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
+      const isInInbox = file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
+      if (!isInInbox) {
+        return `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it won't be routed. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`;
+      }
+    }
     const candidate = this.toCandidate(file, this.app.metadataCache.getFileCache(file));
     const match = findRoute(this.settings.rules, candidate, this.isPro);
     const activeCount = this.settings.rules.filter((rule) => rule.enabled).length;

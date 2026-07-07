@@ -23,8 +23,11 @@ export class RuleEditModal extends Modal {
     const { contentEl } = this;
     contentEl.empty();
     // Use the Modal's own title element rather than injecting a custom heading
-    // (Obsidian UI guideline; keeps us clear of the review bot).
-    this.setTitle(this.isNew ? "Add routing rule" : "Edit routing rule");
+    // (Obsidian UI guideline; keeps us clear of the review bot). Write via
+    // titleEl.setText rather than setTitle(): titleEl has existed on Modal far
+    // longer than our declared minAppVersion (1.4.0), whereas setTitle() is a
+    // newer helper that would throw on older supported clients.
+    this.titleEl.setText(this.isNew ? "Add routing rule" : "Edit routing rule");
 
     this.addTextField(contentEl, "Rule name", this.rule.name, (value) => {
       this.rule.name = value;

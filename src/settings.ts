@@ -67,25 +67,9 @@ export class VaultRouterSettingTab extends PluginSettingTab {
         })
       );
 
-    new Setting(containerEl)
-      .setName("Pro automation")
-      .setHeading();
-
-    new Setting(containerEl)
-      .setName("Auto-route newly created notes")
-      .setDesc("Pro feature. When enabled, new notes are routed shortly after creation.")
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.routeOnCreate).onChange((value) => {
-          if (value && !this.plugin.isPro) {
-            toggle.setValue(false);
-            new Notice(`${PRODUCT_NAME}: auto-routing on create is a Pro feature.`);
-            return;
-          }
-          this.plugin.settings.routeOnCreate = value;
-          void this.plugin.saveSettings();
-        })
-      );
-
+    // This toggle scopes BOTH manual and automatic routing (see doRouteFile),
+    // so it lives with the inbox config, not under "Pro automation" — a Free
+    // user must not dismiss it as a paid-only setting.
     new Setting(containerEl)
       .setName("Only route notes inside the Inbox folder")
       .setDesc("When on, both manual and automatic routing only move notes that live in your Inbox folder — notes anywhere else are left alone.")
@@ -95,46 +79,6 @@ export class VaultRouterSettingTab extends PluginSettingTab {
           void this.plugin.saveSettings();
         })
       );
-
-    new Setting(containerEl)
-      .setName("Show move notices")
-      .setDesc("Show a notice each time a note is auto-routed. Manual and preview commands always report their result.")
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.showMoveNotice).onChange((value) => {
-          this.plugin.settings.showMoveNotice = value;
-          void this.plugin.saveSettings();
-        })
-      );
-
-    new Setting(containerEl)
-      .setName("License and unlock")
-      .setHeading();
-
-    this.renderUpgradeCard(containerEl);
-
-    new Setting(containerEl)
-      .setName("Offline Pro license key")
-      .setDesc(
-        this.plugin.isPro
-          ? `Pro unlocked for ${this.plugin.licenseEmail ?? "this vault"}.`
-          : this.plugin.licenseError ?? "Paste your one-time license key to unlock Pro."
-      )
-      .addTextArea((text) => {
-        // Debounced so pasting/typing a key doesn't re-verify + re-render (and
-        // steal focus) on every keystroke; it settles once the user pauses.
-        const applyLicense = debounce(() => {
-          this.plugin.refreshLicense();
-          void this.plugin.saveSettings();
-          this.display();
-        }, 500, false);
-        text.setPlaceholder("Paste your license key from the purchase email");
-        text.setValue(this.plugin.settings.licenseKey);
-        text.onChange((value) => {
-          this.plugin.settings.licenseKey = value.trim();
-          applyLicense();
-        });
-        return text;
-      });
 
     const activeRuleCount = this.plugin.settings.rules.filter((rule) => rule.enabled).length;
     const rulesDesc = this.plugin.isPro
@@ -220,7 +164,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Add routing rule")
-      .setDesc("Create a rule that files matching notes automatically.")
+      .setDesc("Create a rule that decides where matching notes go when you route them.")
       .addButton((button) =>
         button.setButtonText("Add rule").setCta().onClick(() => {
           const rule = emptyRule();
@@ -235,6 +179,67 @@ export class VaultRouterSettingTab extends PluginSettingTab {
           ).open();
         })
       );
+
+    // Automation and the upgrade card come last: lead with core setup (inbox +
+    // rules), sell after the user understands what a rule does.
+    new Setting(containerEl)
+      .setName("Pro automation")
+      .setHeading();
+
+    new Setting(containerEl)
+      .setName("Auto-route newly created notes")
+      .setDesc("Pro feature. When enabled, new notes are routed shortly after creation.")
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.routeOnCreate).onChange((value) => {
+          if (value && !this.plugin.isPro) {
+            toggle.setValue(false);
+            new Notice(`${PRODUCT_NAME}: auto-routing on create is a Pro feature.`);
+            return;
+          }
+          this.plugin.settings.routeOnCreate = value;
+          void this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("Show move notices")
+      .setDesc("Show a notice each time a note is auto-routed. Manual and preview commands always report their result.")
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.showMoveNotice).onChange((value) => {
+          this.plugin.settings.showMoveNotice = value;
+          void this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("License and unlock")
+      .setHeading();
+
+    this.renderUpgradeCard(containerEl);
+
+    new Setting(containerEl)
+      .setName("Offline Pro license key")
+      .setDesc(
+        this.plugin.isPro
+          ? `Pro unlocked for ${this.plugin.licenseEmail ?? "this vault"}.`
+          : this.plugin.licenseError ?? "Paste your one-time license key to unlock Pro."
+      )
+      .addTextArea((text) => {
+        // Debounced so pasting/typing a key doesn't re-verify + re-render (and
+        // steal focus) on every keystroke; it settles once the user pauses.
+        const applyLicense = debounce(() => {
+          this.plugin.refreshLicense();
+          void this.plugin.saveSettings();
+          this.display();
+        }, 500, false);
+        text.setPlaceholder("Paste your license key from the purchase email");
+        text.setValue(this.plugin.settings.licenseKey);
+        text.onChange((value) => {
+          this.plugin.settings.licenseKey = value.trim();
+          applyLicense();
+        });
+        return text;
+      });
   }
 
   // The upgrade card is the one moment of "selling" in the settings tab. When
@@ -272,7 +277,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });
     for (const benefit of [
-      "Unlimited routing rules — Free stops at 5 active.",
+      `Unlimited routing rules — Free stops at ${FREE_RULE_LIMIT} active.`,
       `Unlimited inbox sweeps — Free moves ${FREE_BULK_LIMIT} notes per run.`,
       "Auto-route new notes the moment they're created.",
     ]) {
