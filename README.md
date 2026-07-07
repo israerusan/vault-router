@@ -29,7 +29,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 *Clear your inbox in one pass.*
 
-- **Manual inbox sweep (Free)** — run *Route inbox now* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
+- **Manual inbox sweep (Free)** — run *Sweep inbox* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
 
 ## Auto-route (Pro)
 
@@ -51,9 +51,8 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 | Manual inbox sweep | Up to 25 moves/run | Unlimited |
 | Active rules | Up to 5 | Unlimited |
 | Auto-route newly created notes | No | Yes |
-| Offline one-time license unlock | No | Yes |
 
-Purchase: [Buy Me a Coffee — Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
+Purchase: [Unlock Vault Router Pro — $12 one-time](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
 
 ## Rule model
 
@@ -79,7 +78,7 @@ Examples:
 
 - `Vault Router: Route current note`
 - `Vault Router: Preview route for current note`
-- `Vault Router: Route inbox now`
+- `Vault Router: Sweep inbox`
 
 ## Suggested starter rules
 
@@ -103,7 +102,7 @@ Vault Router is local-first and never phones home.
 
 ## Activate Pro
 
-1. Purchase on [Buy Me a Coffee](https://buymeacoffee.com/vaultspotlight/e/554745).
+1. [Get Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745).
 2. You'll receive a license key by email.
 3. Obsidian → Settings → Vault Router → paste the key. Pro unlocks immediately (offline verification).
 

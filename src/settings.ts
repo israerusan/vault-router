@@ -51,26 +51,19 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Inbox and manual routing")
-      .setHeading();
+      .setHeading()
+      .setDesc(
+        "Run routing from the command palette: Route current note, Preview route for current note, and Sweep inbox."
+      );
 
     const saveInboxFolder = debounce(() => void this.plugin.saveSettings(), 400, false);
     new Setting(containerEl)
       .setName("Inbox folder")
-      .setDesc("Only route inbox notes from this folder when the inbox-only toggle is on.")
+      .setDesc("The folder “Sweep inbox” clears and auto-routing watches. Notes here are matched against your rules and filed.")
       .addText((text) =>
         text.setPlaceholder("Inbox").setValue(this.plugin.settings.inboxFolder).onChange((value) => {
           this.plugin.settings.inboxFolder = value.trim();
           saveInboxFolder();
-        })
-      );
-
-    new Setting(containerEl)
-      .setName("Show move notices")
-      .setDesc("Show a notice when a note is auto-routed. Manual commands always confirm the result.")
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.showMoveNotice).onChange((value) => {
-          this.plugin.settings.showMoveNotice = value;
-          void this.plugin.saveSettings();
         })
       );
 
@@ -94,11 +87,21 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       );
 
     new Setting(containerEl)
-      .setName("Only auto-route notes from Inbox")
-      .setDesc("Safer default. Prevents random note teleports when you are working fast.")
+      .setName("Only route notes inside the Inbox folder")
+      .setDesc("When on, both manual and automatic routing only move notes that live in your Inbox folder — notes anywhere else are left alone.")
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.autoRouteOnlyInbox).onChange((value) => {
           this.plugin.settings.autoRouteOnlyInbox = value;
+          void this.plugin.saveSettings();
+        })
+      );
+
+    new Setting(containerEl)
+      .setName("Show move notices")
+      .setDesc("Show a notice each time a note is auto-routed. Manual and preview commands always report their result.")
+      .addToggle((toggle) =>
+        toggle.setValue(this.plugin.settings.showMoveNotice).onChange((value) => {
+          this.plugin.settings.showMoveNotice = value;
           void this.plugin.saveSettings();
         })
       );
@@ -124,7 +127,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
           void this.plugin.saveSettings();
           this.display();
         }, 500, false);
-        text.setPlaceholder("base64url(payload).base64url(signature)");
+        text.setPlaceholder("Paste your license key from the purchase email");
         text.setValue(this.plugin.settings.licenseKey);
         text.onChange((value) => {
           this.plugin.settings.licenseKey = value.trim();
@@ -176,7 +179,6 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       }
 
       new Setting(card)
-        .setName("Rule actions")
         .addButton((button) =>
           button.setButtonText("Edit").onClick(() => {
             new RuleEditModal(this.app, rule, (nextRule) => {
@@ -218,7 +220,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Add routing rule")
-      .setDesc("Make the machine do the filing so you do not have to.")
+      .setDesc("Create a rule that files matching notes automatically.")
       .addButton((button) =>
         button.setButtonText("Add rule").setCta().onClick(() => {
           const rule = emptyRule();
@@ -283,7 +285,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       href: PURCHASE_URL,
     });
     cta.setAttr("target", "_blank");
-    cta.setAttr("rel", "noopener");
+    cta.setAttr("rel", "noopener noreferrer");
 
     card.createDiv({
       cls: "vault-router-upgrade-reassure",

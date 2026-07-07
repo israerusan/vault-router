@@ -149,12 +149,19 @@ function sanitizeSegment(value: string): string {
     // BOM) that \s doesn't cover — they'd create invisible-character folder
     // names that look identical to real ones.
     .replace(/\p{Cf}/gu, "")
+    // Also drop C0/C1 control characters (null, etc.) that \s doesn't cover, so
+    // hostile frontmatter can't embed an unprintable byte into a folder name.
+    .replace(/\p{Cc}/gu, "")
     .replace(/\s+/g, " ")
     .replace(/^\.+/, "")
     .replace(/[. ]+$/, "")
     .trim();
   if (!cleaned) return "";
-  return WINDOWS_RESERVED.test(cleaned) ? `_${cleaned}` : cleaned;
+  // On Windows a reserved device name is reserved even with an extension
+  // ("CON.txt"), so test the base name before the first dot, not the whole
+  // segment.
+  const base = cleaned.split(".", 1)[0];
+  return WINDOWS_RESERVED.test(base) ? `_${cleaned}` : cleaned;
 }
 
 export function normalizeFolder(path: string): string {

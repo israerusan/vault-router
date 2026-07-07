@@ -26,8 +26,7 @@ export default tseslint.config(
     },
     rules: {
       "obsidianmd/ui/sentence-case": "off",
-      "obsidianmd/settings-tab/prefer-setting-definitions": "off",
-      "obsidianmd/prefer-create-el": "off"
+      "obsidianmd/settings-tab/prefer-setting-definitions": "off"
     }
   }
 );

@@ -63,8 +63,10 @@ export default class VaultRouterPlugin extends Plugin {
     });
 
     this.addCommand({
+      // Id stays "route-inbox-now" so existing hotkeys keep working; the
+      // visible name matches the "Sweep" verb used in the docs and upgrade card.
       id: "route-inbox-now",
-      name: "Route inbox now",
+      name: "Sweep inbox",
       callback: () => void this.routeInboxNow(),
     });
 
@@ -82,6 +84,15 @@ export default class VaultRouterPlugin extends Plugin {
           // We route them once their metadata is parsed (see "changed") rather
           // than guessing with a fixed timer while frontmatter/tags are empty.
           if (!this.settings.routeOnCreate || !this.isPro) return;
+          // When routing is scoped to the Inbox, a note created elsewhere would
+          // only ever skip — don't track it, or it would sit in pendingCreated
+          // for the session and re-run doRouteFile on every metadata change.
+          if (this.settings.autoRouteOnlyInbox) {
+            const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
+            const inInbox =
+              file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
+            if (!inInbox) return;
+          }
           this.pendingCreated.add(file.path);
         })
       );
@@ -264,7 +275,17 @@ export default class VaultRouterPlugin extends Plugin {
     if (this.settings.autoRouteOnlyInbox) {
       const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
       const isInInbox = file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
-      if (!isInInbox) return "skipped";
+      if (!isInInbox) {
+        // A manual command must never fail silently: tell the user why the note
+        // stayed put and how to route notes that live outside the Inbox.
+        if (manual) {
+          new Notice(
+            `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it wasn't moved. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`,
+            7000
+          );
+        }
+        return "skipped";
+      }
     }
 
     const candidate = this.toCandidate(file, this.app.metadataCache.getFileCache(file));
@@ -357,9 +378,12 @@ export default class VaultRouterPlugin extends Plugin {
         try {
           await this.app.vault.createFolder(current);
         } catch (error) {
-          // Another concurrent route may have created it between the check and
-          // now; only rethrow if it still genuinely doesn't exist.
-          if (!this.app.vault.getAbstractFileByPath(current)) throw error;
+          // createFolder can reject because a concurrent route already made it,
+          // OR because a folder differing only by case exists on a
+          // case-insensitive filesystem (Windows/macOS/mobile). The vault's path
+          // map is case-sensitive and wouldn't reflect the latter, so consult the
+          // adapter (real on-disk state) and only rethrow if it truly is missing.
+          if (!(await this.app.vault.adapter.exists(current))) throw error;
         }
       }
     }
