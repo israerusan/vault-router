@@ -50,16 +50,30 @@ export default class VaultRouterPlugin extends Plugin {
     // Pro-only auto-route toggle when the license no longer validates).
     await this.saveSettings();
 
+    // These two act on the active note, so gate them with checkCallback: they
+    // hide/grey out in the palette when there's no Markdown note active instead
+    // of appearing only to fire an error Notice. "Sweep inbox" stays a plain
+    // callback since it's vault-global.
     this.addCommand({
       id: "route-current-note",
       name: "Route current note",
-      callback: () => void this.routeCurrentNote(),
+      checkCallback: (checking) => {
+        const file = this.app.workspace.getActiveFile();
+        if (!file || file.extension !== "md") return false;
+        if (!checking) void this.routeCurrentNote();
+        return true;
+      },
     });
 
     this.addCommand({
       id: "preview-route-current-note",
       name: "Preview route for current note",
-      callback: () => void this.previewCurrentNote(),
+      checkCallback: (checking) => {
+        const file = this.app.workspace.getActiveFile();
+        if (!file || file.extension !== "md") return false;
+        if (!checking) void this.previewCurrentNote();
+        return true;
+      },
     });
 
     this.addCommand({
@@ -309,14 +323,22 @@ export default class VaultRouterPlugin extends Plugin {
     // is byte-for-byte the string we rename to (normalizePath can fold slashes
     // and Unicode, which would otherwise desync check and write).
     const normalizedDest = normalizePath(match.destinationPath);
-    if (normalizedDest === file.path) {
+    // Treat "already filed" with the SAME NFC+case fold uniqueTargetPath uses,
+    // not strict ===. A note whose on-disk path differs from the rendered
+    // destination only by case or Unicode form is functionally already there;
+    // a strict check would trigger an endless case-only rename every sweep.
+    if (foldPath(normalizedDest) === foldPath(file.path)) {
       if (manual) new Notice(`${PRODUCT_NAME}: ${file.name} is already where it belongs.`);
       return "skipped";
     }
 
     const targetPath = this.uniqueTargetPath(normalizedDest, file);
     try {
-      await this.ensureFolderExists(match.destinationFolder);
+      // Normalize the folder the same way as the rename target (normalizePath
+      // folds Unicode to NFC) so the created folder is byte-identical to the
+      // parent of normalizedDest — otherwise an NFD-derived segment would build
+      // the folder in a form the NFC rename target can't find.
+      await this.ensureFolderExists(normalizePath(match.destinationFolder));
       await this.app.fileManager.renameFile(file, targetPath);
     } catch (error) {
       // Announce failures for manual and auto routes; the bulk sweep reports
@@ -356,13 +378,12 @@ export default class VaultRouterPlugin extends Plugin {
     // moving file keeps an already-correctly-filed note from being bumped to "2".
     // Fold to NFC + lowercase so a decomposed (NFD, macOS) on-disk name and a
     // composed target that look identical are still seen as a collision.
-    const fold = (path: string): string => path.normalize("NFC").toLowerCase();
     const taken = new Set<string>();
     for (const existing of this.app.vault.getAllLoadedFiles()) {
       if (existing.path === movingFile.path) continue;
-      taken.add(fold(existing.path));
+      taken.add(foldPath(existing.path));
     }
-    if (!taken.has(fold(normalizedTarget))) return normalizedTarget;
+    if (!taken.has(foldPath(normalizedTarget))) return normalizedTarget;
 
     const slash = normalizedTarget.lastIndexOf("/");
     const dot = normalizedTarget.lastIndexOf(".");
@@ -372,7 +393,7 @@ export default class VaultRouterPlugin extends Plugin {
     let counter = 2;
     while (true) {
       const next = `${base} ${counter}${ext}`;
-      if (!taken.has(fold(next))) return next;
+      if (!taken.has(foldPath(next))) return next;
       counter += 1;
     }
   }
@@ -398,6 +419,12 @@ export default class VaultRouterPlugin extends Plugin {
       }
     }
   }
+}
+
+// NFC + case fold so paths that differ only by Unicode form or letter case
+// (macOS NFD, case-insensitive filesystems) compare equal.
+function foldPath(path: string): string {
+  return path.normalize("NFC").toLowerCase();
 }
 
 function describeError(error: unknown): string {

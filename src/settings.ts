@@ -59,7 +59,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     const saveInboxFolder = debounce(() => void this.plugin.saveSettings(), 400, false);
     new Setting(containerEl)
       .setName("Inbox folder")
-      .setDesc("The folder “Sweep inbox” clears and auto-routing watches. Notes here are matched against your rules and filed.")
+      .setDesc("The folder “Sweep inbox” routes from and auto-routing watches. Notes here are matched against your rules and filed.")
       .addText((text) =>
         text.setPlaceholder("Inbox").setValue(this.plugin.settings.inboxFolder).onChange((value) => {
           this.plugin.settings.inboxFolder = value.trim();
@@ -221,8 +221,8 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       .setName("Offline Pro license key")
       .setDesc(
         this.plugin.isPro
-          ? `Pro unlocked for ${this.plugin.licenseEmail ?? "this vault"}.`
-          : this.plugin.licenseError ?? "Paste your one-time license key to unlock Pro."
+          ? "Your license key is saved. Clear this field to switch back to Free."
+          : this.plugin.licenseError ?? "Unlock Pro with your one-time license key."
       )
       .addTextArea((text) => {
         // Debounced so pasting/typing a key doesn't re-verify + re-render (and

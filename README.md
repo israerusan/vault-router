@@ -54,21 +54,9 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 Purchase: [Unlock Vault Router Pro — $12 one-time](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
 
-## Rule model
+## Destination examples
 
-Each rule can match on any combination of:
-
-- **Title starts with** — the note's name begins with your text (case-insensitive).
-- **Path includes** — the note's path contains your text.
-- **Required tag** — the note carries this tag (inline or in frontmatter; `#` optional).
-- **Frontmatter property** — the property *exists*, or *equals* a value when you set one.
-
-All filled conditions must match, and the first matching rule wins. Destination folders can use placeholders:
-
-- `{{frontmatter:project}}`, `{{frontmatter:type}}`
-- `{{basename}}`, `{{filename}}`, `{{ext}}`
-
-Examples:
+Combine literal folders with placeholders (`{{frontmatter:key}}`, `{{basename}}`, `{{filename}}`, `{{ext}}`) to build the target path:
 
 - `Meetings/{{frontmatter:project}}`
 - `Areas/School/{{frontmatter:course}}`

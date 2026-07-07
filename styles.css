@@ -66,7 +66,7 @@
 }
 
 .vault-router-upgrade-price {
-  color: var(--text-muted);
+  color: var(--text-normal);
   font-size: var(--font-ui-smaller);
   white-space: nowrap;
 }
@@ -85,7 +85,10 @@
 }
 
 .vault-router-upgrade-cta {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
   padding: 0.5rem 1.1rem;
   border-radius: var(--radius-s);
   background: var(--interactive-accent);

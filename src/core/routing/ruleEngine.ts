@@ -153,9 +153,12 @@ function sanitizeSegment(value: string): string {
     // hostile frontmatter can't embed an unprintable byte into a folder name.
     .replace(/\p{Cc}/gu, "")
     .replace(/\s+/g, " ")
+    // Trim BEFORE stripping leading dots: otherwise a value like " .config"
+    // keeps its leading space, the anchored ^\.+ can't match, and the later
+    // trim exposes the hidden ".config" the strip was meant to remove.
+    .trim()
     .replace(/^\.+/, "")
-    .replace(/[. ]+$/, "")
-    .trim();
+    .replace(/[. ]+$/, "");
   if (!cleaned) return "";
   // On Windows a reserved device name is reserved even with an extension
   // ("CON.txt"), so test the base name before the first dot, not the whole
