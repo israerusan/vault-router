@@ -101,12 +101,7 @@ export default class VaultRouterPlugin extends Plugin {
           // When routing is scoped to the Inbox, a note created elsewhere would
           // only ever skip — don't track it, or it would sit in pendingCreated
           // for the session and re-run doRouteFile on every metadata change.
-          if (this.settings.autoRouteOnlyInbox) {
-            const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
-            const inInbox =
-              file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
-            if (!inInbox) return;
-          }
+          if (this.settings.autoRouteOnlyInbox && !this.isInInbox(file)) return;
           this.pendingCreated.add(file.path);
         })
       );
@@ -225,7 +220,7 @@ export default class VaultRouterPlugin extends Plugin {
     const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
     const files = this.app.vault
       .getMarkdownFiles()
-      .filter((file) => file.path.startsWith(`${inboxFolder}/`));
+      .filter((file) => this.isInInbox(file));
 
     if (!files.length) {
       new Notice(`${PRODUCT_NAME}: no Markdown notes found in ${inboxFolder || "Inbox"}.`);
@@ -243,8 +238,17 @@ export default class VaultRouterPlugin extends Plugin {
 
     for (const file of files) {
       if (moved >= moveLimit) {
-        hitCap = true;
-        break;
+        // Only flag the cap once we find a note that WOULD have moved but was
+        // blocked by the limit. getMarkdownFiles() order is arbitrary, so the
+        // file after the last move is often a non-matching note — flagging the
+        // cap on it would falsely claim "more remain" (and mis-sell Pro) when
+        // everything routable was already filed. Keep scanning the remainder
+        // and stop at the first genuine match.
+        if (this.wouldRoute(file)) {
+          hitCap = true;
+          break;
+        }
+        continue;
       }
       const result = await this.routeFile(file, "bulk");
       if (result === "moved") moved += 1;
@@ -264,12 +268,8 @@ export default class VaultRouterPlugin extends Plugin {
     // Preview must respect the same inbox gate doRouteFile enforces, or it would
     // promise a move that "Route current note" then refuses for a note outside
     // the Inbox (autoRouteOnlyInbox defaults on).
-    if (this.settings.autoRouteOnlyInbox) {
-      const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
-      const isInInbox = file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
-      if (!isInInbox) {
-        return `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it won't be routed. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`;
-      }
+    if (this.settings.autoRouteOnlyInbox && !this.isInInbox(file)) {
+      return `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it won't be routed. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`;
     }
     const candidate = this.toCandidate(file, this.app.metadataCache.getFileCache(file));
     const match = findRoute(this.settings.rules, candidate, this.isPro);
@@ -296,20 +296,16 @@ export default class VaultRouterPlugin extends Plugin {
   ): Promise<"moved" | "skipped" | "failed"> {
     const manual = mode === "manual";
 
-    if (this.settings.autoRouteOnlyInbox) {
-      const inboxFolder = normalizeFolder(this.settings.inboxFolder || "Inbox");
-      const isInInbox = file.path.startsWith(`${inboxFolder}/`) || file.parent?.path === inboxFolder;
-      if (!isInInbox) {
-        // A manual command must never fail silently: tell the user why the note
-        // stayed put and how to route notes that live outside the Inbox.
-        if (manual) {
-          new Notice(
-            `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it wasn't moved. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`,
-            7000
-          );
-        }
-        return "skipped";
+    if (this.settings.autoRouteOnlyInbox && !this.isInInbox(file)) {
+      // A manual command must never fail silently: tell the user why the note
+      // stayed put and how to route notes that live outside the Inbox.
+      if (manual) {
+        new Notice(
+          `${PRODUCT_NAME}: ${file.name} is outside your Inbox folder, so it wasn't moved. Turn off “Only route notes inside the Inbox folder” to route notes anywhere.`,
+          7000
+        );
       }
+      return "skipped";
     }
 
     const candidate = this.toCandidate(file, this.app.metadataCache.getFileCache(file));
@@ -354,6 +350,31 @@ export default class VaultRouterPlugin extends Plugin {
       new Notice(`${PRODUCT_NAME}: moved ${file.name} → ${targetPath}`);
     }
     return "moved";
+  }
+
+  // True when the note lives in (or under) the configured Inbox folder. Folds
+  // both sides to NFC + lowercase so this gate agrees with folder creation,
+  // collision detection, and rule matching on case-insensitive filesystems
+  // (Windows/macOS/mobile): a folder on disk named "inbox" still matches an
+  // "Inbox" setting and vice versa, instead of silently routing nothing.
+  private isInInbox(file: TFile): boolean {
+    const inboxFolder = foldPath(normalizeFolder(this.settings.inboxFolder || "Inbox"));
+    const path = foldPath(file.path);
+    const parent = file.parent ? foldPath(file.parent.path) : "";
+    return path.startsWith(`${inboxFolder}/`) || parent === inboxFolder;
+  }
+
+  // Dry evaluation: would doRouteFile actually move this note? The sweep uses it
+  // to tell a genuine cap hit (a routable note the free limit blocked) from the
+  // common case where the notes left after the last move simply match no rule,
+  // so the "run it again / upgrade to Pro" notice can't falsely claim more remain.
+  private wouldRoute(file: TFile): boolean {
+    const candidate = this.toCandidate(file, this.app.metadataCache.getFileCache(file));
+    const match = findRoute(this.settings.rules, candidate, this.isPro);
+    if (!match) return false;
+    // Mirror doRouteFile's fold-equal "already where it belongs" skip so a note
+    // that resolves to its own path isn't counted as blocked work.
+    return foldPath(normalizePath(match.destinationPath)) !== foldPath(file.path);
   }
 
   private toCandidate(file: TFile, cache: CachedMetadata | null): CandidateNote {

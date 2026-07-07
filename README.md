@@ -36,7 +36,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 *New notes file themselves.*
 
 - **Auto-route new notes (Pro)** — newly created notes are routed automatically once their metadata (frontmatter and tags) has been indexed, so property-aware rules land them in the right place.
-- **Inbox-only by default (Pro)** — a safe default keeps auto-routing scoped to your Inbox so nothing gets teleported while you work.
+- **Inbox-only by default (Pro)** — auto-routing is scoped to your Inbox out of the box, so notes you create elsewhere stay put while you work.
 
 ## Free vs Pro
 

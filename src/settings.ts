@@ -53,13 +53,13 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       .setName("Inbox and manual routing")
       .setHeading()
       .setDesc(
-        "Run routing from the command palette: Route current note, Preview route for current note, and Sweep inbox."
+        "Vault Router moves notes into the right folder using your rules. Run it from the command palette: Route current note, Preview route for current note, and Sweep inbox."
       );
 
     const saveInboxFolder = debounce(() => void this.plugin.saveSettings(), 400, false);
     new Setting(containerEl)
       .setName("Inbox folder")
-      .setDesc("The folder “Sweep inbox” routes from and auto-routing watches. Notes here are matched against your rules and filed.")
+      .setDesc("The folder “Sweep inbox” routes from. Notes here are matched against your rules and filed.")
       .addText((text) =>
         text.setPlaceholder("Inbox").setValue(this.plugin.settings.inboxFolder).onChange((value) => {
           this.plugin.settings.inboxFolder = value.trim();
@@ -272,7 +272,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     card.createDiv({
       cls: "vault-router-upgrade-tagline",
-      text: "Turn manual, capped filing into hands-off automation.",
+      text: "Turn manual, capped routing into hands-off automation.",
     });
 
     const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });

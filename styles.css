@@ -73,6 +73,10 @@
 
 .vault-router-upgrade-tagline {
   color: var(--text-normal);
+  /* Pin the value hook one step above the --font-ui-small benefit list so the
+     card reads title -> pitch -> features instead of collapsing the pitch and
+     features to one flat size on themes whose base font equals --font-ui-small. */
+  font-size: var(--font-ui-medium);
   margin-top: 0.15rem;
 }
 
@@ -82,6 +86,23 @@
   color: var(--text-normal);
   font-size: var(--font-ui-small);
   line-height: 1.55;
+  list-style: none;
+}
+
+/* A checkmark marks these as things Pro includes (meaning, not decoration),
+   the conventional treatment for a "what you get" inclusion list. Theme-token
+   colored, no external asset. */
+.vault-router-upgrade-benefits li {
+  position: relative;
+  padding-left: 1.4rem;
+}
+
+.vault-router-upgrade-benefits li::before {
+  content: "\2713";
+  position: absolute;
+  left: 0;
+  color: var(--interactive-accent);
+  font-weight: 700;
 }
 
 .vault-router-upgrade-cta {
