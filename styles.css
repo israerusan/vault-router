@@ -4,6 +4,12 @@
   margin-top: 0.35rem;
 }
 
+.vault-router-rule-section {
+  margin: 1rem 0 0;
+  font-size: var(--font-ui-small);
+  color: var(--text-normal);
+}
+
 .vault-router-rule-summary {
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
@@ -82,7 +88,10 @@
 
 .vault-router-upgrade-benefits {
   margin: 0.6rem 0 0.8rem;
-  padding-left: 1.1rem;
+  /* No list padding: each li's own padding-left reserves the checkmark column,
+     so the marker aligns under the card's title/tagline left edge instead of
+     floating ~1.1rem inboard. */
+  padding-left: 0;
   color: var(--text-normal);
   font-size: var(--font-ui-small);
   line-height: 1.55;

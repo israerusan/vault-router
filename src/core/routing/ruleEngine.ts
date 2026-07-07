@@ -77,7 +77,7 @@ export function findRoute(
     // If any template token resolves to empty (e.g. missing frontmatter), skip
     // the rule rather than silently collapsing the path to a shorter/wrong
     // folder. renderDestination returns null in that case.
-    const rendered = renderDestination(rule.destinationFolder, note);
+    const rendered = renderDestination(rule.destinationFolder, note, rule);
     if (rendered === null) continue;
     const destinationFolder = normalizeFolder(rendered);
     if (!destinationFolder) continue;
@@ -102,17 +102,21 @@ export function renderTemplate(template: string, note: CandidateNote): string {
 // Like renderTemplate, but returns null if the template contained at least one
 // token that resolved to an empty segment. Callers use this to skip a rule
 // instead of routing a note into a partially-collapsed destination.
-export function renderDestination(template: string, note: CandidateNote): string | null {
+export function renderDestination(
+  template: string,
+  note: CandidateNote,
+  rule?: RoutingRule
+): string | null {
   let sawEmptyToken = false;
   const rendered = template.replace(TOKEN_PATTERN, (_, token) => {
-    const segment = sanitizeSegment(resolveToken(String(token), note));
+    const segment = sanitizeSegment(resolveToken(String(token), note, rule));
     if (!segment) sawEmptyToken = true;
     return segment;
   });
   return sawEmptyToken ? null : rendered;
 }
 
-function resolveToken(token: string, note: CandidateNote): string {
+function resolveToken(token: string, note: CandidateNote, rule?: RoutingRule): string {
   const trimmed = token.trim();
   if (trimmed === "basename") return note.basename;
   if (trimmed === "filename") return note.filename;
@@ -121,9 +125,26 @@ function resolveToken(token: string, note: CandidateNote): string {
   if (frontmatterMatch) {
     const key = frontmatterMatch[1].trim();
     const value = note.frontmatter[key];
+    // matchRule matches a list-valued property if ANY element equals the wanted
+    // value. When the destination renders that SAME key, file the note under the
+    // element that actually satisfied the match — otherwise a note matched via a
+    // later element (project: [alpha, beta], propertyValue "beta") would be filed
+    // under the first element ("alpha"), a folder the rule never keyed on.
+    if (rule && Array.isArray(value) && rule.propertyKey.trim() === key && rule.propertyValue.trim()) {
+      return matchedArrayElement(value, rule.propertyValue.trim());
+    }
     return scalarText(value);
   }
   return "";
+}
+
+// The array element whose folded text equals the wanted value; falls back to the
+// first element (scalarText) if none is found, though matchRule guarantees a hit
+// whenever this is reached.
+function matchedArrayElement(value: unknown[], wanted: string): string {
+  const target = fold(wanted);
+  const hit = value.find((item) => fold(scalarText(item)) === target);
+  return hit !== undefined ? scalarText(hit) : scalarText(value);
 }
 
 function scalarText(value: unknown): string {

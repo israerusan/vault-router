@@ -134,13 +134,15 @@ export default class VaultRouterPlugin extends Plugin {
     });
   }
 
-  // Route a newly-created note now that its cache is available. Only drop it
-  // from the pending set once it actually moves, so a note that isn't routable
-  // yet (e.g. its matching frontmatter hasn't been typed) gets another chance
-  // when it's next indexed.
+  // Route a newly-created note now that its cache is available. Keep it in the
+  // pending set only while it's still "skipped" (e.g. its matching frontmatter
+  // hasn't been typed) so a later index gives it another chance. Drop it once it
+  // "moved" OR "failed": a move that throws (a persistent collision, a
+  // non-folder parent) won't spontaneously succeed on the next metadata change,
+  // so retrying it would just re-fire the same error Notice on every edit.
   private async routeCreatedFile(file: TFile): Promise<void> {
     const result = await this.routeFile(file, "auto");
-    if (result === "moved") this.pendingCreated.delete(file.path);
+    if (result !== "skipped") this.pendingCreated.delete(file.path);
   }
 
   async loadSettings(): Promise<void> {
@@ -281,7 +283,16 @@ export default class VaultRouterPlugin extends Plugin {
     if (!match) {
       return `${PRODUCT_NAME}: no routing rule matched ${file.name}.${capHint}`;
     }
-    return `${PRODUCT_NAME}: ${file.name} → ${match.destinationPath} via “${match.rule.name}”.${capHint}`;
+    // Report the exact path the route would use, not match.destinationPath: mirror
+    // doRouteFile's already-there skip and its collision numbering so the dry run
+    // never promises a path (Archive/Report.md) the route then bumps to a numbered
+    // copy (Archive/Report 2.md).
+    const normalizedDest = normalizePath(match.destinationPath);
+    if (foldPath(normalizedDest) === foldPath(file.path)) {
+      return `${PRODUCT_NAME}: ${file.name} is already where it belongs.${capHint}`;
+    }
+    const targetPath = this.uniqueTargetPath(normalizedDest, file);
+    return `${PRODUCT_NAME}: ${file.name} → ${targetPath} via “${match.rule.name}”.${capHint}`;
   }
 
   private routeFile(file: TFile, mode: RouteMode): Promise<"moved" | "skipped" | "failed"> {

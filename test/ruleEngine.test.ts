@@ -154,6 +154,20 @@ assert.ok(
   "exists should treat an empty array as absent"
 );
 
+// A note matched via a LATER array element is filed under THAT element, not the
+// first: destination rendering agrees with the equality match instead of always
+// using value[0].
+const listMatchRoute = findRoute(
+  [{ ...rule, titleStartsWith: "", requiredTag: "", pathIncludes: "", propertyKey: "project", propertyValue: "beta", destinationFolder: "Meetings/{{frontmatter:project}}" }],
+  { ...note, tags: [], frontmatter: { project: ["Alpha", "Beta"] } },
+  true
+);
+assert.equal(
+  listMatchRoute?.destinationFolder,
+  "Meetings/Beta",
+  "destination renders the matched array element, not the first"
+);
+
 // --- normalizeRules: untrusted data.json must never crash the engine/UI ---
 // Malformed elements are dropped; the rest are repaired to safe defaults.
 const cleaned = normalizeRules([null, 42, "nope", { name: "x", enabled: true }]);

@@ -42,6 +42,12 @@ export class RuleEditModal extends Modal {
       text: "Destination supports {{frontmatter:key}}, {{basename}}, {{filename}}, and {{ext}}.",
     });
 
+    contentEl.createEl("h4", { cls: "vault-router-rule-section", text: "Match when" });
+    contentEl.createDiv({
+      cls: "vault-router-rule-help",
+      text: "A note is routed only when it satisfies every condition you fill in below. Leave a field blank to ignore it.",
+    });
+
     this.addTextField(contentEl, "Title starts with", this.rule.titleStartsWith, (value) => {
       this.rule.titleStartsWith = value;
     }, "Daily -");

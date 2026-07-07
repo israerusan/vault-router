@@ -90,7 +90,7 @@ Vault Router is local-first and never phones home.
 
 ## Activate Pro
 
-1. [Get Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745).
+1. [Unlock Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745).
 2. You'll receive a license key by email.
 3. Obsidian → Settings → Vault Router → paste the key. Pro unlocks immediately (offline verification).
 

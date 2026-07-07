@@ -118,7 +118,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       if (cappedRuleIds.has(rule.id)) {
         card.createDiv({
           cls: "vault-router-rule-capped",
-          text: `Inactive on Free — beyond the ${FREE_RULE_LIMIT}-rule limit. Upgrade to Pro to run it.`,
+          text: `Inactive on Free — beyond the ${FREE_RULE_LIMIT}-rule limit. Unlock Pro to run it.`,
         });
       }
 
@@ -203,7 +203,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
 
     new Setting(containerEl)
       .setName("Show move notices")
-      .setDesc("Show a notice each time a note is auto-routed. Manual and preview commands always report their result.")
+      .setDesc("Pro feature. Show a notice each time a note is auto-routed. Manual and preview commands always report their result.")
       .addToggle((toggle) =>
         toggle.setValue(this.plugin.settings.showMoveNotice).onChange((value) => {
           this.plugin.settings.showMoveNotice = value;
