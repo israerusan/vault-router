@@ -1,6 +1,6 @@
 {
   "name": "vault-router",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Route notes from Inbox to the right folder using simple local rules.",
   "main": "main.js",
   "type": "module",

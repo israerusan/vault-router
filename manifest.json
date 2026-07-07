@@ -1,7 +1,7 @@
 {
   "id": "vault-router",
   "name": "Vault Router",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "minAppVersion": "1.4.0",
   "description": "Move new notes out of Inbox with fast local routing rules.",
   "author": "Israel Avila",

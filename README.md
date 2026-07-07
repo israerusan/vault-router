@@ -53,7 +53,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 | Auto-route newly created notes | No | Yes |
 | Offline one-time license unlock | No | Yes |
 
-Purchase: [Buy Me a Coffee — Vault Router Pro](https://buymeacoffee.com/vaultrouter). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
+Purchase: [Buy Me a Coffee — Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
 
 ## Rule model
 
@@ -103,7 +103,7 @@ Vault Router is local-first and never phones home.
 
 ## Activate Pro
 
-1. Purchase on [Buy Me a Coffee](https://buymeacoffee.com/vaultrouter).
+1. Purchase on [Buy Me a Coffee](https://buymeacoffee.com/vaultspotlight/e/554745).
 2. You'll receive a license key by email.
 3. Obsidian → Settings → Vault Router → paste the key. Pro unlocks immediately (offline verification).
 

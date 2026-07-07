@@ -1,5 +1,5 @@
 import { App, Notice, PluginSettingTab, Setting, debounce } from "obsidian";
-import { FREE_RULE_LIMIT, PRODUCT_NAME } from "./product";
+import { FREE_BULK_LIMIT, FREE_RULE_LIMIT, PRODUCT_NAME, PRO_PRICE, PURCHASE_URL } from "./product";
 import type { RoutingRule, VaultRouterSettings } from "./types";
 import type VaultRouterPlugin from "./main";
 import { RuleEditModal } from "./ui/RuleEditModal";
@@ -106,6 +106,8 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     new Setting(containerEl)
       .setName("License and unlock")
       .setHeading();
+
+    this.renderUpgradeCard(containerEl);
 
     new Setting(containerEl)
       .setName("Offline Pro license key")
@@ -231,6 +233,62 @@ export class VaultRouterSettingTab extends PluginSettingTab {
           ).open();
         })
       );
+  }
+
+  // The upgrade card is the one moment of "selling" in the settings tab. When
+  // the user is already Pro it collapses to a quiet confirmation; otherwise it
+  // states the price once, lists exactly what Pro unlocks, and offers a single
+  // outbound checkout link — no nagging, no repeated CTAs elsewhere.
+  private renderUpgradeCard(containerEl: HTMLElement): void {
+    if (this.plugin.isPro) {
+      const active = containerEl.createDiv({ cls: "vault-router-pro-active" });
+      active.createSpan({ cls: "vault-router-pro-badge", text: "PRO" });
+      active.createSpan({
+        text: this.plugin.licenseEmail
+          ? `Thanks for going Pro — unlocked for ${this.plugin.licenseEmail}.`
+          : "Thanks for going Pro — every limit is lifted.",
+      });
+      return;
+    }
+
+    const card = containerEl.createDiv({ cls: "vault-router-upgrade-card" });
+
+    const header = card.createDiv({ cls: "vault-router-upgrade-header" });
+    header.createEl("strong", {
+      cls: "vault-router-upgrade-title",
+      text: "Vault Router Pro",
+    });
+    header.createSpan({
+      cls: "vault-router-upgrade-price",
+      text: `${PRO_PRICE} · one-time`,
+    });
+
+    card.createDiv({
+      cls: "vault-router-upgrade-tagline",
+      text: "Turn manual, capped filing into hands-off automation.",
+    });
+
+    const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });
+    for (const benefit of [
+      "Unlimited routing rules — Free stops at 5 active.",
+      `Unlimited inbox sweeps — Free moves ${FREE_BULK_LIMIT} notes per run.`,
+      "Auto-route new notes the moment they're created.",
+    ]) {
+      benefits.createEl("li", { text: benefit });
+    }
+
+    const cta = card.createEl("a", {
+      cls: "vault-router-upgrade-cta",
+      text: `Unlock Pro — ${PRO_PRICE}`,
+      href: PURCHASE_URL,
+    });
+    cta.setAttr("target", "_blank");
+    cta.setAttr("rel", "noopener");
+
+    card.createDiv({
+      cls: "vault-router-upgrade-reassure",
+      text: "Keys verify offline with Ed25519 — no account, no server, no subscription.",
+    });
   }
 }
 

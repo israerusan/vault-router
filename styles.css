@@ -35,3 +35,86 @@
   min-height: 1.2em;
   margin-top: 0.5rem;
 }
+
+/* --- Pro upgrade card --------------------------------------------------- */
+
+.vault-router-upgrade-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  margin: 0.5rem 0 1rem;
+  background: var(--background-secondary);
+}
+
+.vault-router-upgrade-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.vault-router-upgrade-title {
+  font-size: var(--font-ui-medium);
+}
+
+.vault-router-upgrade-price {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  white-space: nowrap;
+}
+
+.vault-router-upgrade-tagline {
+  color: var(--text-normal);
+  margin-top: 0.15rem;
+}
+
+.vault-router-upgrade-benefits {
+  margin: 0.6rem 0 0.8rem;
+  padding-left: 1.1rem;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.55;
+}
+
+.vault-router-upgrade-cta {
+  display: inline-block;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.vault-router-upgrade-cta:hover {
+  background: var(--interactive-accent-hover);
+  color: var(--text-on-accent);
+  text-decoration: none;
+}
+
+.vault-router-upgrade-reassure {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-top: 0.65rem;
+}
+
+/* --- Pro active confirmation -------------------------------------------- */
+
+.vault-router-pro-active {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0.5rem 0 1rem;
+  color: var(--text-normal);
+}
+
+.vault-router-pro-badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 6px;
+  background: var(--interactive-accent);
+  color: var(--text-on-accent);
+  font-size: var(--font-ui-smaller);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
