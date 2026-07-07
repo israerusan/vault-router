@@ -6,7 +6,7 @@ Vault Router keeps your vault tidy by doing one job completely: decide where a n
 
 - **Route** — move the current note to its rule-matched home.
 - **Preview** — see exactly where a note will land before it moves.
-- **Sweep** — clear a pile of inbox notes in one pass.
+- **Sweep** — route every matching note in your inbox in one pass.
 
 Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is genuinely useful on day one. Pro adds unlimited rules, sweeps with no per-run move cap, and hands-off auto-routing for people who never want to file a note by hand again.
 
@@ -27,7 +27,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 ## Sweep
 
-*Clear your inbox in one pass.*
+*Route your inbox backlog in one pass.*
 
 - **Manual inbox sweep (Free)** — run *Sweep inbox* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
 
@@ -35,7 +35,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 *New notes file themselves.*
 
-- **Auto-route new notes (Pro)** — newly created notes are routed automatically once their metadata (frontmatter and tags) has been indexed, so property-aware rules land them in the right place.
+- **Auto-route new notes (Pro)** — new notes file themselves, so you stop dragging notes out of your inbox. Routing waits until a note's metadata (frontmatter and tags) has been indexed, so property-aware rules land it in the right place.
 - **Inbox-only by default (Pro)** — auto-routing is scoped to your Inbox out of the box, so notes you create elsewhere stay put while you work.
 
 ## Free vs Pro

@@ -60,6 +60,11 @@ export class RuleEditModal extends Modal {
       this.rule.requiredTag = value;
     }, "meeting");
 
+    contentEl.createDiv({
+      cls: "vault-router-rule-help",
+      text: "Matches the exact tag. Sub-tags like project/client are not matched by a rule for project.",
+    });
+
     this.addTextField(contentEl, "Property key", this.rule.propertyKey, (value) => {
       this.rule.propertyKey = value;
     }, "project");

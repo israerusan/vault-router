@@ -238,25 +238,22 @@ export default class VaultRouterPlugin extends Plugin {
     let failed = 0;
     let hitCap = false;
 
-    for (const file of files) {
+    for (let i = 0; i < files.length; i++) {
       if (moved >= moveLimit) {
-        // Only flag the cap once we find a note that WOULD have moved but was
-        // blocked by the limit. getMarkdownFiles() order is arbitrary, so the
-        // file after the last move is often a non-matching note — flagging the
-        // cap on it would falsely claim "more remain" (and mis-sell Pro) when
-        // everything routable was already filed. Keep scanning the remainder
-        // and stop at the first genuine match.
-        if (this.wouldRoute(file)) {
-          hitCap = true;
-          break;
-        }
-        // A non-matching note after the cap is still a note the sweep left in
-        // place — count it as skipped so the summary's "skipped N" is the same
-        // regardless of where these notes fell in the arbitrary scan order.
-        skipped += 1;
-        continue;
+        // The free move cap is spent. Every note from here on stays in the
+        // inbox, so count the whole remainder as skipped in one shot — this
+        // keeps moved+skipped+failed reconciled with files.length and makes
+        // "skipped N" independent of the arbitrary getMarkdownFiles() order
+        // (breaking at the first post-cap match, as we used to, left the
+        // trailing notes uncounted). Flag the cap only if at least one of the
+        // remaining notes WOULD have routed, so the "more remain" upsell can't
+        // fire when everything routable was already filed.
+        const remaining = files.slice(i);
+        skipped += remaining.length;
+        hitCap = remaining.some((remainingFile) => this.wouldRoute(remainingFile));
+        break;
       }
-      const result = await this.routeFile(file, "bulk");
+      const result = await this.routeFile(files[i], "bulk");
       if (result === "moved") moved += 1;
       else if (result === "failed") failed += 1;
       else skipped += 1;

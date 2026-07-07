@@ -69,6 +69,10 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.5rem;
+  /* Let the nowrap price drop below the (now --font-ui-large) title on a
+     narrow mobile settings pane instead of the title wrapping against a
+     right-pinned price. */
+  flex-wrap: wrap;
 }
 
 .vault-router-upgrade-title {
