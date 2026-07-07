@@ -1,0 +1,37 @@
+.vault-router-rule-help {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-top: 0.35rem;
+}
+
+.vault-router-rule-summary {
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  margin-top: 0.25rem;
+}
+
+.vault-router-rule-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 10px;
+  padding: 0.75rem;
+  margin-bottom: 0.75rem;
+  background: var(--background-secondary);
+}
+
+.vault-router-rule-card strong {
+  display: inline-block;
+  margin-bottom: 0.2rem;
+}
+
+.vault-router-rule-capped {
+  color: var(--text-warning);
+  font-size: var(--font-ui-smaller);
+  margin-top: 0.35rem;
+}
+
+.vault-router-rule-message {
+  color: var(--text-warning);
+  font-size: var(--font-ui-smaller);
+  min-height: 1.2em;
+  margin-top: 0.5rem;
+}
