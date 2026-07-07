@@ -8,7 +8,7 @@ Vault Router keeps your vault tidy by doing one job completely: decide where a n
 - **Preview** — see exactly where a note will land before it moves.
 - **Sweep** — route every matching note in your Inbox in one pass.
 
-Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is useful on day one. Pro lifts every limit and files new notes for you — see the Free vs Pro table below.
+Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is useful on day one. Pro lifts every limit and files new notes for you — a **$12 one-time, offline-verified** unlock: [Unlock Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745) (or see the Free vs Pro table below).
 
 ## Route
 
@@ -29,7 +29,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 *Route your Inbox backlog in one pass.*
 
-- **Manual inbox sweep (Free)** — run *Sweep inbox* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
+- **Manual Inbox sweep (Free)** — run *Sweep inbox* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
 
 ## Auto-route (Pro)
 
@@ -48,7 +48,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 | Preview a route (dry run) | Yes | Yes |
 | Rule matching by title, path, tag, property | Yes | Yes |
 | Destination templates (`{{frontmatter:project}}`, …) | Yes | Yes |
-| Manual inbox sweep | Up to 25 moves/run | Unlimited |
+| Manual Inbox sweep | Up to 25 moves/run | Unlimited |
 | Active rules | Up to 5 | Unlimited |
 | Auto-route newly created notes | No | Yes |
 

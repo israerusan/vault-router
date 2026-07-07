@@ -211,7 +211,14 @@ function sanitizeSegment(value: string): string {
   // Re-trim after slicing so a truncation can't leave a trailing dot/space
   // (which Windows rejects).
   if (cleaned.length > 120) {
-    cleaned = cleaned.slice(0, 120).replace(/[. ]+$/, "");
+    cleaned = cleaned
+      .slice(0, 120)
+      // slice() cuts on a UTF-16 code-unit boundary, so an astral char (emoji,
+      // CJK ext, …) straddling position 120 leaves a dangling high surrogate.
+      // Drop a trailing lone surrogate so the segment can't end in an invalid
+      // half-pair, then re-trim so truncation can't leave a trailing dot/space.
+      .replace(/[\uD800-\uDBFF]$/, "")
+      .replace(/[. ]+$/, "");
   }
   if (!cleaned) return "";
   // On Windows a reserved device name is reserved even with an extension

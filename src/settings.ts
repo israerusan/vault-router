@@ -287,7 +287,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });
     for (const benefit of [
       `Unlimited routing rules — Free stops at ${FREE_RULE_LIMIT} active.`,
-      `No per-sweep move cap — Free routes up to ${FREE_BULK_LIMIT} notes each run.`,
+      `No per-sweep move cap — Free routes up to ${FREE_BULK_LIMIT} notes per sweep.`,
       "Auto-route new notes for you — no more manual filing.",
     ]) {
       benefits.createEl("li", { text: benefit });
