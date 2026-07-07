@@ -91,7 +91,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       const overflow = activeRuleCount - FREE_RULE_LIMIT;
       rulesDesc = `First matching rule wins. Free evaluates your first ${FREE_RULE_LIMIT} active rules — ${overflow} more ${overflow === 1 ? "is" : "are"} enabled but skipped.`;
     } else {
-      rulesDesc = `First matching rule wins. Free evaluates your first ${FREE_RULE_LIMIT} active rules (${activeRuleCount} of ${FREE_RULE_LIMIT} used).`;
+      rulesDesc = `First matching rule wins. Free evaluates up to ${FREE_RULE_LIMIT} active rules (${activeRuleCount} of ${FREE_RULE_LIMIT} used).`;
     }
 
     new Setting(containerEl)
@@ -288,7 +288,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     for (const benefit of [
       `Unlimited routing rules — Free stops at ${FREE_RULE_LIMIT} active.`,
       `No per-sweep move cap — Free routes up to ${FREE_BULK_LIMIT} notes each run.`,
-      "Auto-route new notes the moment they're created.",
+      "Auto-route new notes for you — no more manual filing.",
     ]) {
       benefits.createEl("li", { text: benefit });
     }

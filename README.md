@@ -8,7 +8,7 @@ Vault Router keeps your vault tidy by doing one job completely: decide where a n
 - **Preview** — see exactly where a note will land before it moves.
 - **Sweep** — route every matching note in your Inbox in one pass.
 
-Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is genuinely useful on day one. Pro lifts every limit and files new notes for you — see the Free vs Pro table below.
+Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is useful on day one. Pro lifts every limit and files new notes for you — see the Free vs Pro table below.
 
 ## Route
 
@@ -27,7 +27,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 
 ## Sweep
 
-*Route your inbox backlog in one pass.*
+*Route your Inbox backlog in one pass.*
 
 - **Manual inbox sweep (Free)** — run *Sweep inbox* to route every matching note in your Inbox folder. Free moves up to **25 notes per run**; **Pro is unlimited.**
 

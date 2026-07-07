@@ -48,10 +48,17 @@ function ownFrontmatter(note: CandidateNote, key: string): unknown {
 
 // A frontmatter property counts as "present" when the key holds a real value.
 // An empty string or an empty array is treated as absent (nothing to route on).
-function propertyPresent(value: unknown): boolean {
+function propertyPresent(value: unknown, depth = 0): boolean {
   if (value == null) return false;
   if (typeof value === "string") return value.trim() !== "";
-  if (Array.isArray(value)) return value.some((item) => propertyPresent(item));
+  if (Array.isArray(value)) {
+    // Descend one level only: a normal list-valued property (project: [a, b])
+    // needs the recursion, but a hostile deeply-nested array (project: [[[…]]])
+    // would otherwise recurse to its nesting depth and stack-overflow inside
+    // findRoute. Past one level, treat a non-empty nested array as present.
+    if (depth > 0) return value.length > 0;
+    return value.some((item) => propertyPresent(item, depth + 1));
+  }
   return true;
 }
 
@@ -158,8 +165,15 @@ function matchedArrayElement(value: unknown[], wanted: string): string {
   return hit !== undefined ? scalarText(hit) : scalarText(value);
 }
 
-function scalarText(value: unknown): string {
-  if (Array.isArray(value)) return value.length ? scalarText(value[0]) : "";
+function scalarText(value: unknown, depth = 0): string {
+  if (Array.isArray(value)) {
+    // Render only the first element of a single-level list; a nested array (or an
+    // empty one) yields "". The depth guard stops a hostile deeply-nested array
+    // from recursing to stack-overflow while preserving the one-level behavior
+    // matchRule documents.
+    if (depth > 0 || value.length === 0) return "";
+    return scalarText(value[0], depth + 1);
+  }
   if (value == null) return "";
   if (typeof value === "string") return value;
   if (typeof value === "number" || typeof value === "boolean") return String(value);

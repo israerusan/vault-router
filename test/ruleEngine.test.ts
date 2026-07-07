@@ -192,6 +192,20 @@ assert.equal(
   "destination renders the matched array element, not the first"
 );
 
+// --- Adversarial frontmatter: a deeply-nested array must not stack-overflow ---
+// A hostile/synced note can hold a YAML array nested thousands of levels deep;
+// matching and rendering must stay bounded rather than recursing to its depth.
+let nested: unknown = ["Alpha"];
+for (let i = 0; i < 5000; i++) nested = [nested];
+const deepNote: CandidateNote = { ...note, tags: [], frontmatter: { project: nested } };
+assert.doesNotThrow(() => {
+  findRoute(
+    [{ ...rule, titleStartsWith: "", requiredTag: "", pathIncludes: "", propertyKey: "project", propertyValue: "", destinationFolder: "Projects/{{frontmatter:project}}" }],
+    deepNote,
+    true
+  );
+}, "a deeply-nested frontmatter array must not overflow the stack");
+
 // --- normalizeRules: untrusted data.json must never crash the engine/UI ---
 // Malformed elements are dropped; the rest are repaired to safe defaults.
 const cleaned = normalizeRules([null, 42, "nope", { name: "x", enabled: true }]);

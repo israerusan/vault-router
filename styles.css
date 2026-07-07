@@ -86,7 +86,9 @@
 
 .vault-router-upgrade-price {
   color: var(--text-normal);
-  font-size: var(--font-ui-smaller);
+  /* Level with the benefit list rather than below it: a $12 one-time price is the
+     strongest objection-killer, not fine print to shrink beneath the body copy. */
+  font-size: var(--font-ui-small);
   white-space: nowrap;
 }
 

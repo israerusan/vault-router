@@ -401,7 +401,12 @@ export default class VaultRouterPlugin extends Plugin {
   }
 
   private toCandidate(file: TFile, cache: CachedMetadata | null): CandidateNote {
-    const frontmatter = (cache?.frontmatter ?? {}) as Record<string, unknown>;
+    // Obsidian injects a non-YAML `position` key (the frontmatter block's source
+    // range) as an OWN enumerable property of cache.frontmatter. It is present on
+    // every parsed note, so a rule with property key `position` and no value would
+    // match EVERY note. Strip it so only real YAML keys are matchable/renderable.
+    const frontmatter = { ...((cache?.frontmatter ?? {}) as Record<string, unknown>) };
+    delete frontmatter.position;
     const inlineTags = (cache?.tags ?? []).map((tag) => tag.tag.replace(/^#/, ""));
     // Obsidian recognizes BOTH `tags` and the singular `tag` as frontmatter tag
     // keys (a note with `tag: meeting` shows that tag in the tag pane), so fold
