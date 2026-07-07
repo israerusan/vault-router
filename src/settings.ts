@@ -50,7 +50,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     containerEl.empty();
 
     new Setting(containerEl)
-      .setName("Inbox and manual routing")
+      .setName("Inbox and routing")
       .setHeading()
       .setDesc(
         "Vault Router moves notes into the right folder using your rules. Run it from the command palette: Route current note, Preview route for current note, and Sweep inbox."
@@ -81,9 +81,18 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       );
 
     const activeRuleCount = this.plugin.settings.rules.filter((rule) => rule.enabled).length;
-    const rulesDesc = this.plugin.isPro
-      ? "First matching rule wins. Pro has no rule limit."
-      : `First matching rule wins. Free evaluates your first ${FREE_RULE_LIMIT} active rules (${Math.min(activeRuleCount, FREE_RULE_LIMIT)} of ${FREE_RULE_LIMIT} used).`;
+    let rulesDesc: string;
+    if (this.plugin.isPro) {
+      rulesDesc = "First matching rule wins. Pro has no rule limit.";
+    } else if (activeRuleCount > FREE_RULE_LIMIT) {
+      // Name the overflow directly in the header — otherwise it reads as if only
+      // the first N rules exist while more cards sit below, their skip only
+      // discoverable per-card.
+      const overflow = activeRuleCount - FREE_RULE_LIMIT;
+      rulesDesc = `First matching rule wins. Free evaluates your first ${FREE_RULE_LIMIT} active rules — ${overflow} more ${overflow === 1 ? "is" : "are"} enabled but skipped.`;
+    } else {
+      rulesDesc = `First matching rule wins. Free evaluates your first ${FREE_RULE_LIMIT} active rules (${activeRuleCount} of ${FREE_RULE_LIMIT} used).`;
+    }
 
     new Setting(containerEl)
       .setName("Routing rules")
@@ -278,7 +287,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });
     for (const benefit of [
       `Unlimited routing rules — Free stops at ${FREE_RULE_LIMIT} active.`,
-      `No per-sweep move cap — Free files up to ${FREE_BULK_LIMIT} notes each run.`,
+      `No per-sweep move cap — Free routes up to ${FREE_BULK_LIMIT} notes each run.`,
       "Auto-route new notes the moment they're created.",
     ]) {
       benefits.createEl("li", { text: benefit });

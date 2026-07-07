@@ -120,9 +120,13 @@ export default class VaultRouterPlugin extends Plugin {
       this.registerEvent(
         this.app.vault.on("rename", (file, oldPath) => {
           if (!this.pendingCreated.delete(oldPath)) return;
-          if (file instanceof TFile && file.extension === "md") {
-            this.pendingCreated.add(file.path);
-          }
+          if (!(file instanceof TFile) || file.extension !== "md") return;
+          // Apply the same gate as the create listener before re-tracking: if the
+          // note was moved OUT of the Inbox (manually, not by routing) while
+          // routing is inbox-scoped, re-adding it would leave it pending and
+          // re-run doRouteFile -> "skipped" on every metadata change all session.
+          if (this.settings.autoRouteOnlyInbox && !this.isInInbox(file)) return;
+          this.pendingCreated.add(file.path);
         })
       );
 
@@ -399,7 +403,11 @@ export default class VaultRouterPlugin extends Plugin {
   private toCandidate(file: TFile, cache: CachedMetadata | null): CandidateNote {
     const frontmatter = (cache?.frontmatter ?? {}) as Record<string, unknown>;
     const inlineTags = (cache?.tags ?? []).map((tag) => tag.tag.replace(/^#/, ""));
-    const frontmatterTags = flattenTags(frontmatter.tags);
+    // Obsidian recognizes BOTH `tags` and the singular `tag` as frontmatter tag
+    // keys (a note with `tag: meeting` shows that tag in the tag pane), so fold
+    // in both — otherwise a Required-tag rule silently misses notes that use the
+    // singular key. The Set dedupe below handles any overlap.
+    const frontmatterTags = [...flattenTags(frontmatter.tags), ...flattenTags(frontmatter.tag)];
     return {
       path: file.path,
       basename: file.basename,

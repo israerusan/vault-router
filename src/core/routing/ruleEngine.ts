@@ -24,7 +24,7 @@ export function matchRule(rule: RoutingRule, note: CandidateNote): boolean {
   }
 
   if (rule.propertyKey.trim()) {
-    const actual = note.frontmatter[rule.propertyKey.trim()];
+    const actual = ownFrontmatter(note, rule.propertyKey.trim());
     if (rule.propertyValue.trim()) {
       if (!valueMatches(actual, rule.propertyValue.trim())) return false;
     } else if (!propertyPresent(actual)) {
@@ -33,6 +33,17 @@ export function matchRule(rule: RoutingRule, note: CandidateNote): boolean {
   }
 
   return true;
+}
+
+// Read a frontmatter key as an OWN property only. Bare bracket access resolves
+// inherited Object.prototype members (__proto__, toString, constructor, …),
+// which are truthy for every note — a rule keyed on one of those names would
+// otherwise "match" (and mass-mis-file) the whole inbox. Treat such a key as
+// absent so matching/rendering is confined to real YAML keys.
+function ownFrontmatter(note: CandidateNote, key: string): unknown {
+  return Object.prototype.hasOwnProperty.call(note.frontmatter, key)
+    ? note.frontmatter[key]
+    : undefined;
 }
 
 // A frontmatter property counts as "present" when the key holds a real value.
@@ -124,7 +135,7 @@ function resolveToken(token: string, note: CandidateNote, rule?: RoutingRule): s
   const frontmatterMatch = /^frontmatter:(.+)$/i.exec(trimmed);
   if (frontmatterMatch) {
     const key = frontmatterMatch[1].trim();
-    const value = note.frontmatter[key];
+    const value = ownFrontmatter(note, key);
     // matchRule matches a list-valued property if ANY element equals the wanted
     // value. When the destination renders that SAME key, file the note under the
     // element that actually satisfied the match — otherwise a note matched via a
@@ -163,7 +174,7 @@ const WINDOWS_RESERVED = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
 // reserved device names — so hostile frontmatter like "../../secret" can't
 // escape the destination parent (or the vault).
 function sanitizeSegment(value: string): string {
-  const cleaned = value
+  let cleaned = value
     .replace(/[\\/]/g, "-")
     .replace(/[:*?"<>|]/g, "-")
     // Strip Unicode format characters (zero-width space/joiners, word joiner,
@@ -180,6 +191,14 @@ function sanitizeSegment(value: string): string {
     .trim()
     .replace(/^\.+/, "")
     .replace(/[. ]+$/, "");
+  // Bound the segment length: a multi-hundred-char frontmatter value would
+  // otherwise produce a folder name that blows past the per-segment (255) or
+  // total path limit on Windows/mobile, making createFolder/renameFile throw.
+  // Re-trim after slicing so a truncation can't leave a trailing dot/space
+  // (which Windows rejects).
+  if (cleaned.length > 120) {
+    cleaned = cleaned.slice(0, 120).replace(/[. ]+$/, "");
+  }
   if (!cleaned) return "";
   // On Windows a reserved device name is reserved even with an extension
   // ("CON.txt"), so test the base name before the first dot, not the whole

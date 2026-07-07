@@ -56,8 +56,11 @@
   border: 1px solid var(--background-modifier-border);
   /* One restrained accent cue so the sole conversion surface reads as "the
      offer" rather than another rule row — ties the card container to the same
-     --interactive-accent used by the benefit checkmarks and CTA. */
-  border-left: 2px solid var(--interactive-accent);
+     --interactive-accent used by the benefit checkmarks and CTA. Rendered as an
+     inset shadow rather than a heavier border-left so it ignores the rounded
+     corner geometry and leaves a clean join (a 2px accent border blended against
+     the 1px top/bottom border produced a visible seam on the curve). */
+  box-shadow: inset 3px 0 0 0 var(--interactive-accent);
   border-radius: var(--radius-m);
   padding: 1rem 1.1rem;
   margin: 0.5rem 0 1rem;

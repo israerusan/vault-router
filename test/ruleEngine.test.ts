@@ -90,6 +90,30 @@ const missingValue = findRoute([
 ], note, true);
 assert.equal(missingValue, null, "missing required property should fail");
 
+// --- Inherited property names must NOT match: a rule keyed on an Object.proto
+// member (toString, constructor, __proto__) would otherwise "exist" for every
+// note and mass-mis-file the inbox. Treat such a key as absent. ---
+const protoRule: RoutingRule = {
+  ...rule,
+  titleStartsWith: "",
+  requiredTag: "",
+  pathIncludes: "",
+  propertyKey: "toString",
+  propertyValue: "",
+};
+assert.ok(!matchRule(protoRule, note), "an inherited property name must not count as present");
+assert.equal(
+  renderTemplate("{{frontmatter:toString}}", note),
+  "",
+  "an inherited property name renders empty, not the prototype function"
+);
+
+// --- Over-long segments are length-bounded so createFolder/renameFile can't
+// throw on a path that exceeds the OS per-segment / total limit. ---
+const longValue = "x".repeat(400);
+const longSegment = renderTemplate("{{frontmatter:project}}", { ...note, frontmatter: { project: longValue } });
+assert.ok(longSegment.length <= 120, `rendered segment must be length-bounded, got ${longSegment.length}`);
+
 // --- Path-traversal security: a hostile frontmatter value must not escape ---
 const evilNote: CandidateNote = {
   ...note,
