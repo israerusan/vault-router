@@ -250,6 +250,10 @@ export default class VaultRouterPlugin extends Plugin {
           hitCap = true;
           break;
         }
+        // A non-matching note after the cap is still a note the sweep left in
+        // place — count it as skipped so the summary's "skipped N" is the same
+        // regardless of where these notes fell in the arbitrary scan order.
+        skipped += 1;
         continue;
       }
       const result = await this.routeFile(file, "bulk");
@@ -347,6 +351,13 @@ export default class VaultRouterPlugin extends Plugin {
       // the folder in a form the NFC rename target can't find.
       await this.ensureFolderExists(normalizePath(match.destinationFolder));
       await this.app.fileManager.renameFile(file, targetPath);
+      // Once a note is actually filed it must leave pendingCreated for good.
+      // The rename fires the vault "rename" listener, which re-adds the note's
+      // NEW path — so a note tracked at creation but routed by a manual command
+      // or the bulk sweep would otherwise linger and stay auto-route-eligible on
+      // every later edit this session. Delete the post-rename path here, in every
+      // mode, so session state can't silently re-relocate an already-filed note.
+      this.pendingCreated.delete(targetPath);
     } catch (error) {
       // Announce failures for manual and auto routes; the bulk sweep reports
       // them in its summary instead.

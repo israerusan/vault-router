@@ -8,7 +8,7 @@ Vault Router keeps your vault tidy by doing one job completely: decide where a n
 - **Preview** — see exactly where a note will land before it moves.
 - **Sweep** — clear a pile of inbox notes in one pass.
 
-Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is genuinely useful on day one. Pro adds unlimited rules, unlimited sweeps, and hands-off auto-routing for people who never want to file a note by hand again.
+Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is genuinely useful on day one. Pro adds unlimited rules, sweeps with no per-run move cap, and hands-off auto-routing for people who never want to file a note by hand again.
 
 ## Route
 

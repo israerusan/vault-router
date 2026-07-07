@@ -118,7 +118,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
       if (cappedRuleIds.has(rule.id)) {
         card.createDiv({
           cls: "vault-router-rule-capped",
-          text: `Inactive on Free — beyond the ${FREE_RULE_LIMIT}-rule limit. Unlock Pro to run it.`,
+          text: `Enabled, but skipped on Free — beyond the ${FREE_RULE_LIMIT}-rule limit. Unlock Pro to run it.`,
         });
       }
 
@@ -278,7 +278,7 @@ export class VaultRouterSettingTab extends PluginSettingTab {
     const benefits = card.createEl("ul", { cls: "vault-router-upgrade-benefits" });
     for (const benefit of [
       `Unlimited routing rules — Free stops at ${FREE_RULE_LIMIT} active.`,
-      `Unlimited inbox sweeps — Free moves ${FREE_BULK_LIMIT} notes per run.`,
+      `No per-sweep move cap — Free files up to ${FREE_BULK_LIMIT} notes each run.`,
       "Auto-route new notes the moment they're created.",
     ]) {
       benefits.createEl("li", { text: benefit });

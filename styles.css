@@ -54,6 +54,10 @@
 
 .vault-router-upgrade-card {
   border: 1px solid var(--background-modifier-border);
+  /* One restrained accent cue so the sole conversion surface reads as "the
+     offer" rather than another rule row — ties the card container to the same
+     --interactive-accent used by the benefit checkmarks and CTA. */
+  border-left: 2px solid var(--interactive-accent);
   border-radius: var(--radius-m);
   padding: 1rem 1.1rem;
   margin: 0.5rem 0 1rem;
@@ -68,7 +72,9 @@
 }
 
 .vault-router-upgrade-title {
-  font-size: var(--font-ui-medium);
+  /* Large so the headline out-ranks the medium tagline, forming a clean
+     title -> pitch -> features cascade instead of two near-equal lines. */
+  font-size: var(--font-ui-large);
 }
 
 .vault-router-upgrade-price {
