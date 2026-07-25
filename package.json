@@ -1,6 +1,6 @@
 {
   "name": "vault-router",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Move new notes out of Inbox with fast local routing rules.",
   "main": "main.js",
   "type": "module",
