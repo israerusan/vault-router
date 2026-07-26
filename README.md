@@ -8,6 +8,11 @@ Vault Router keeps your vault tidy by doing one job completely: decide where a n
 - **Preview** — see exactly where a note will land before it moves.
 - **Sweep** — route every matching note in your Inbox in one pass.
 
+<!-- SCREENSHOT SLOT — drop a real capture here to lift conversions.
+     ![Preview route: the destination folder and the rule that matched, before anything moves](docs/assets/hero.png)
+     Suggested shot: the "Preview route" result showing destination + matched rule, or an Inbox sweep summary. Save as docs/assets/hero.png -->
+
+
 Rules match on title, path, tags, and frontmatter — all evaluated locally. Free is useful on day one. Pro lifts every limit and files new notes for you — a **$12 one-time, offline-verified** unlock: [Unlock Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745) (or see the Free vs Pro table below).
 
 ## Route
@@ -52,7 +57,7 @@ Rules match on title, path, tags, and frontmatter — all evaluated locally. Fre
 | Active rules | Up to 5 | Unlimited |
 | Auto-route newly created notes | No | Yes |
 
-Purchase: [Unlock Vault Router Pro — $12 one-time](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
+Purchase: [Buy Me a Coffee — Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745). License keys are verified **offline** (Ed25519) — no account, server, or subscription.
 
 ## Destination examples
 
@@ -91,7 +96,7 @@ Vault Router is local-first and never phones home.
 ## Activate Pro
 
 1. [Unlock Vault Router Pro](https://buymeacoffee.com/vaultspotlight/e/554745).
-2. You'll receive a license key by email.
+2. Your license key is emailed to you **automatically, within seconds** — delivery is fully automated, no waiting.
 3. Obsidian → Settings → Vault Router → paste the key. Pro unlocks immediately (offline verification).
 
 ## Development
