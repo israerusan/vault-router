@@ -3,8 +3,9 @@
   "name": "Vault Router",
   "version": "0.2.1",
   "minAppVersion": "1.4.0",
-  "description": "Move new notes out of Inbox with fast local routing rules.",
+  "description": "Clear your Inbox automatically. Local rules file each new note into the right folder by tag, property, title or content as soon as it lands.",
   "author": "Israel Avila",
   "authorUrl": "https://github.com/israerusan",
+  "fundingUrl": "https://buymeacoffee.com/vaultspotlight/e/554745",
   "isDesktopOnly": false
 }
