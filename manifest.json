@@ -1,7 +1,7 @@
 {
   "id": "vault-router",
   "name": "Vault Router",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "minAppVersion": "1.4.0",
   "description": "Clear your Inbox automatically. Local rules file each new note into the right folder by tag, property, title or content as soon as it lands.",
   "author": "Israel Avila",
